@@ -1,8 +1,24 @@
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, useFormState } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CardDetailsSchema } from './models/CardDetailsSchema';
 import {useState, ChangeEvent} from 'react';
+import complete from './images/icon-complete.svg';
+import { clear } from 'console';
+
+function ThankYou(props: { clearForm: Function}) {
+  return (
+   <div className='flex flex-col items-center justify-center gap-8 w-full'>
+    <img src={complete} alt='tick icon' />
+
+    <div className="flex flex-col items-center gap-6 pb-4">
+      <h1 className='uppercase text-3xl tracking-widest text-neutralVeryDarkViolet'>Thank You!</h1>
+      <p className='text-neutralDarkGrayishViolet'>We've added your card details</p>
+    </div>
+    <button onClick={() => props.clearForm()} className='w-full bg-neutralVeryDarkViolet text-neutralWhite rounded-lg py-[.875rem]'>Continue</button>
+   </div>
+  )
+}
 
 
 function CardFront(props: {cardHolderName: string, cardNumber: string, expiryMonth: string, expiryYear: string}) {
@@ -63,6 +79,7 @@ function Banner() {
 type CardDetails = z.infer<typeof CardDetailsSchema>
 
 function App() {
+  const [submitted, setSubmitted] = useState(false);
 
   const [cardHolderName, setCardHolderName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -70,15 +87,17 @@ function App() {
   const [expiryYear, setExpiryYear] = useState('');
   const [cvc, setCvc] = useState('');
 
-  const {register, handleSubmit, trigger, formState: {errors}} = useForm<CardDetails>({ resolver: zodResolver(CardDetailsSchema)});
+  const {register, handleSubmit, trigger, reset, formState: {errors}} = useForm<CardDetails>({ resolver: zodResolver(CardDetailsSchema)});
 
 
   const onSubmit: SubmitHandler<CardDetails> = (data) => {
-    console.log("SUCCESSFULLY SUBMITTED DATA");
-
     // show success page
+    setSubmitted(true);
+  }
 
-    console.log(data);
+  function clearForm() {
+    setSubmitted(false);
+    reset();
   }
 
   let expiryError;
@@ -101,6 +120,11 @@ function App() {
 
       <div className=" flex items-center justify-center
       lg:h-full lg:col-start-6 lg:col-span-3 pt-20 mx-6">
+        {submitted ? (
+          <ThankYou clearForm={clearForm} />
+        ) :
+        (
+          
         <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-3">
 
           {/* CARDHOLDER NAME & NUMBER */}
@@ -109,7 +133,7 @@ function App() {
             <input {...register("cardholderName")} 
             onChange={e => setCardHolderName(e.target.value)}
             type="text" name="cardholderName" placeholder="e.g. Jane Appleseed" className={`border rounded-lg px-4 py-2 w-full border-neutralLightGrayishViolet outline-none focus:border-endGradient placeholder:text-neutralLightGrayishViolet ${errors.cardholderName ? 'border-primaryRed':''}`}/>
-            {errors.cardholderName && <p>{errors.cardholderName.message}</p>}
+            {errors.cardholderName && <p className='text-primaryRed text-[0.75rem]'>{errors.cardholderName.message}</p>}
           </div>
           <div className="flex flex-col gap-2 w-full">
             <label htmlFor="cardNumber" className="uppercase text-[0.75rem] tracking-[2px] text-neutralVeryDarkViolet">Card Number</label>
@@ -139,6 +163,7 @@ function App() {
           </div>
           <button type='submit' className="py-[.875rem] bg-neutralVeryDarkViolet text-neutralWhite rounded-lg">Submit</button>
         </form>
+        )}
       </div>
     </div>
     
