@@ -97,6 +97,11 @@ function App() {
 
   function clearForm() {
     setSubmitted(false);
+    setCardHolderName('');
+    setCardNumber('');
+    setExpiryMonth('');
+    setExpiryYear('');
+    setCvc('');
     reset();
   }
 
