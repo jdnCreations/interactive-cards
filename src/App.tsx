@@ -1,10 +1,9 @@
-import { useForm, SubmitHandler, useFormState } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CardDetailsSchema } from './models/CardDetailsSchema';
-import {useState, ChangeEvent} from 'react';
+import {useState } from 'react';
 import complete from './images/icon-complete.svg';
-import { clear } from 'console';
 
 function ThankYou(props: { clearForm: Function}) {
   return (
@@ -87,7 +86,7 @@ function App() {
   const [expiryYear, setExpiryYear] = useState('');
   const [cvc, setCvc] = useState('');
 
-  const {register, handleSubmit, trigger, reset, formState: {errors}} = useForm<CardDetails>({ resolver: zodResolver(CardDetailsSchema)});
+  const {register, handleSubmit, reset, formState: {errors}} = useForm<CardDetails>({ resolver: zodResolver(CardDetailsSchema)});
 
 
   const onSubmit: SubmitHandler<CardDetails> = (data) => {
@@ -95,6 +94,7 @@ function App() {
     setSubmitted(true);
   }
 
+  // clears form & resets state
   function clearForm() {
     setSubmitted(false);
     setCardHolderName('');
